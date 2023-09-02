@@ -36,7 +36,7 @@ public class Dollar1Recogniser : MonoBehaviour
 		return translatedToOrigin;
 	}
 
-	public (string, float) DoRecognition(Vector2[] points, int n, List<GestureManager.GestureTemplate> gestureTemplates)
+	public (string, float, Color) DoRecognition(Vector2[] points, int n, List<GestureManager.GestureTemplate> gestureTemplates)
 	{
 		Vector2[] preparedPoints = Normalize(points, n);
 		return Recognize(preparedPoints, gestureTemplates);
@@ -185,12 +185,13 @@ public class Dollar1Recogniser : MonoBehaviour
 		return newPoints;
 	}
 
-	private (string, float) Recognize(Vector2[] inputPoints, List<GestureManager.GestureTemplate> gestureTemplates)
+	private (string, float, Color) Recognize(Vector2[] inputPoints, List<GestureManager.GestureTemplate> gestureTemplates)
 	{
 		float bestDistance = Mathf.Infinity;
 		Vector2[] bestMatchedTemplate = new Vector2[0];
 		float bestScore = 0;
 		string bestTemplateName = "None";
+		Color bestTemplateColor = Color.clear;
 
 		foreach (var template in gestureTemplates)
 		{
@@ -204,11 +205,12 @@ public class Dollar1Recogniser : MonoBehaviour
 					bestMatchedTemplate = templatePoints;
 					bestScore = 1 - bestDistance / (0.5f * Mathf.Sqrt(bestMatchedTemplate.Length * bestMatchedTemplate.Length + bestMatchedTemplate.Length * bestMatchedTemplate.Length));
 					bestTemplateName = template.Name;
+					bestTemplateColor = template.Color;
 				}
 			}
 		}
 
-		return (bestTemplateName, bestScore);
+		return (bestTemplateName, bestScore, bestTemplateColor);
 	}
 
 	private float DistanceAtBestAngle(Vector2[] inputPoints, Vector2[] templatePoints, float angleA, float angleB, float angleDelta)

@@ -7,13 +7,18 @@ public class Drawable : MonoBehaviour
 {
 	[SerializeField] private Texture2D paintTexture;
 	[SerializeField] private Texture2D resetTexture;
+	[SerializeField] private Texture2D fadingTexture;
 	[SerializeField] private Color paintColor = Color.red;
+	[SerializeField] private Color finishedColor = Color.red;
 	[SerializeField] private int brushWidth = 10;
 
 	[SerializeField] private List<Vector2> drawpoints = new List<Vector2>();
 	private bool isPainting = false;
 
 	private Vector2 previousHitPoint = Vector2.zero;
+
+	private bool isFading = false;
+	[SerializeField] private float fadeSpeed = 0.02f;
 
 	private void Update()
 	{
@@ -24,6 +29,7 @@ public class Drawable : MonoBehaviour
 		else if (Input.GetMouseButtonUp(0)) // Left mouse button released
 		{
 			isPainting = false;
+			isFading = true;
 			ResetTexture();
 			previousHitPoint = Vector2.zero; // Reset the previous hit point
 		}
@@ -45,6 +51,42 @@ public class Drawable : MonoBehaviour
 
 				previousHitPoint = hitPoint;
 			}
+		}
+		if (isFading)
+		{
+			FadeOutDrawing();
+		}
+	}
+
+	private void FadeOutDrawing()
+	{
+		Color[] currentPixels = fadingTexture.GetPixels();
+		Color[] referencePixels = resetTexture.GetPixels();
+
+		bool isFinishedFading = true;
+
+		for (int i = 0; i < currentPixels.Length; i++)
+		{
+			currentPixels[i] = Color.Lerp(currentPixels[i], referencePixels[i], fadeSpeed);
+
+			// Check if the pixel has fully faded
+			if (currentPixels[i].a > 0.1f)
+			{
+				isFinishedFading = false;
+			}
+			else
+			{
+				// If the pixel has fully faded, set it to fully transparent
+				currentPixels[i] = referencePixels[i];
+			}
+		}
+
+		fadingTexture.SetPixels(currentPixels);
+		fadingTexture.Apply();
+
+		if (isFinishedFading)
+		{
+			isFading = false;
 		}
 	}
 
@@ -104,8 +146,35 @@ public class Drawable : MonoBehaviour
 	{
 		GestureManager.Instance.Process(drawpoints);
 		drawpoints.Clear();
-		Color[] referencePixels = resetTexture.GetPixels();
-		paintTexture.SetPixels(referencePixels);
+
+		finishedColor = GestureManager.Instance.templateColor;
+
+		Color[] referencePixels = paintTexture.GetPixels();
+		Color[] fadingPixels = fadingTexture.GetPixels();
+
+		const float colorTolerance = 0.1f;
+		for (int i = 0; i < referencePixels.Length; i++)
+		{
+			// Check if the current pixel color matches the paintColor
+			float colorDifference = Vector4.Distance(referencePixels[i], paintColor);
+			if (colorDifference <= colorTolerance)
+			{
+				// Replace the fading texture pixel with the second color
+				fadingPixels[i] = finishedColor;
+			}
+			else
+			{
+				fadingPixels[i] = referencePixels[i];
+			}
+		}
+
+		// Apply the modified fading texture pixels
+		fadingTexture.SetPixels(fadingPixels);
+		fadingTexture.Apply();
+
+		Color[] currentPixels = resetTexture.GetPixels();
+
+		paintTexture.SetPixels(currentPixels);
 		paintTexture.Apply();
 	}
 }

@@ -47,3 +47,4 @@ MonoBehaviour:
   saveAsTemplate: 0
   templateName: 
   templates: []
+  detectionThreshold: 0.7

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Xml;
 using UnityEditor;
@@ -14,30 +13,37 @@ public class GestureManager : MonoBehaviour
 	public bool saveAsTemplate = false;
 	[HideInInspector]
 	public string templateName;
+	[HideInInspector]
+	public Color templateColor = Color.red;
 
 	[SerializeField]
 	private List<GestureTemplate> templates = new List<GestureTemplate>();
 
+	[SerializeField]
+	private float detectionThreshold = 0.7f;
 
 	[Serializable]
 	public struct GestureTemplate
 	{
 		public string Name;
+		public Color Color;
 		public List<Vector2[]> Points;
 
-		public GestureTemplate(string templateName, Vector2[] preparePoints)
+		public GestureTemplate(string templateName, Vector2[] preparePoints, Color templateColor)
 		{
 			Name = templateName;
 			Points = new List<Vector2[]>
 			{
 				preparePoints
 			};
+			Color = templateColor;
 		}
 	}
 	private class TemplatesData
 	{
 		public string name;
 		public Vector2[] points;
+		public Color color;
 	}
 
 	private string templatesFilePath;
@@ -65,7 +71,7 @@ public class GestureManager : MonoBehaviour
 		Debug.Log(templatesFilePath);
 		templates = LoadTemplates();
 	}
-	
+
 	public void Process(List<Vector2> drawpoints)
 	{
 		Vector2[] drawPoints = drawpoints.ToArray();
@@ -74,17 +80,24 @@ public class GestureManager : MonoBehaviour
 
 		if (!saveAsTemplate)
 		{
-			(string bestTemplateName, float bestScore) = Dollar1Recogniser.Instance.DoRecognition(drawPoints, 64, templates);
+			(string bestTemplateName, float bestScore, Color bestColor) = Dollar1Recogniser.Instance.DoRecognition(drawPoints, 64, templates);
 			Debug.Log("Best Template: " + bestTemplateName + ", Score: " + bestScore);
-			
-			if (bestTemplateName == "AmongUs")
+			if (bestScore >= detectionThreshold)
 			{
-                UnityEngine.Color color = UnityEngine.Color.red;
-				string message = "Sussy Baka";
+				templateColor = bestColor;
+				if (bestTemplateName == "AmongUs")
+				{
+					Color color = Color.red;
+					string message = "Sussy Baka";
 
-				Debug.Log(string.Format("<size=24><color=#{0:X2}{1:X2}{2:X2}>{3}</color></size>", (byte)(color.r * 255f), (byte)(color.g * 255f), (byte)(color.b * 255f), message));
-				Application.Quit();
-				UnityEditor.EditorApplication.isPlaying = false;
+					Debug.Log(string.Format("<size=24><color=#{0:X2}{1:X2}{2:X2}>{3}</color></size>", (byte)(color.r * 255f), (byte)(color.g * 255f), (byte)(color.b * 255f), message));
+					Application.Quit();
+					UnityEditor.EditorApplication.isPlaying = false;
+				}
+			}
+			else
+			{
+				templateColor = Color.clear;
 			}
 		}
 		else
@@ -103,7 +116,7 @@ public class GestureManager : MonoBehaviour
 			}
 			if (!templateExists)
 			{
-				GestureTemplate newTemplate = new GestureTemplate(templateName, processedPoints);
+				GestureTemplate newTemplate = new GestureTemplate(templateName, processedPoints, templateColor);
 				templates.Add(newTemplate);
 				Debug.Log("Created a new template: " + templateName);
 			}
@@ -127,23 +140,30 @@ public class GestureManager : MonoBehaviour
 			TemplatesData data = JsonUtility.FromJson<TemplatesData>(json);
 
 			bool foundExistingTemplate = false;
+			GestureTemplate existingTemplate = default;
 
-			foreach (GestureTemplate existingTemplate in loadedTemplates)
+			foreach (GestureTemplate template in loadedTemplates)
 			{
-				if (existingTemplate.Name == data.name)
+				if (template.Name == data.name)
 				{
-					existingTemplate.Points.Add(data.points);
+					existingTemplate = template;
 					foundExistingTemplate = true;
 					break;
 				}
 			}
 
-			if (!foundExistingTemplate)
+			if (foundExistingTemplate)
+			{
+				existingTemplate.Points.Add(data.points);
+				existingTemplate.Color = data.color;
+			}
+			else
 			{
 				GestureTemplate newTemplate = new GestureTemplate();
 				newTemplate.Name = data.name;
 				newTemplate.Points = new List<Vector2[]>();
 				newTemplate.Points.Add(data.points);
+				newTemplate.Color = data.color;
 				loadedTemplates.Add(newTemplate);
 			}
 		}
@@ -161,6 +181,7 @@ public class GestureManager : MonoBehaviour
 				TemplatesData data = new TemplatesData();
 				data.name = template.Name;
 				data.points = points;
+				data.color = template.Color;
 				string json = JsonUtility.ToJson(data, true);
 
 				// Create a unique file name for each template
@@ -168,22 +189,32 @@ public class GestureManager : MonoBehaviour
 				string templateFileName = $"{data.name}_{i}.json";
 				string templateFilePath = Path.Combine(templatesFolderPath, templateFileName);
 
-				// Only save the template if the file doesn't exist already
-				if (!File.Exists(templateFilePath))
+				// Check if the file already exists
+				if (File.Exists(templateFilePath))
 				{
-					File.WriteAllText(templateFilePath, json);
+					// Read the existing file and check the color
+					string existingJson = File.ReadAllText(templateFilePath);
+					TemplatesData existingData = JsonUtility.FromJson<TemplatesData>(existingJson);
+
+					// Compare the colors
+					if (existingData.color == template.Color)
+					{
+						// The colors are the same, no need to override
+						i++;
+						continue;
+					}
 				}
+
+				// Save the template (override if it exists or create a new file)
+				File.WriteAllText(templateFilePath, json);
 				i++;
 			}
 		}
 		Debug.Log("Templates saved.");
 	}
-
-
 }
-
 #if UNITY_EDITOR
-[CustomEditor(typeof(GestureManager))]
+	[CustomEditor(typeof(GestureManager))]
 public class GestureManager_Editor : Editor
 {
 	public override void OnInspectorGUI()
@@ -197,6 +228,7 @@ public class GestureManager_Editor : Editor
 		if (script.saveAsTemplate) // if bool is true, show other fields
 		{
 			script.templateName = EditorGUILayout.TextField("Template Name", script.templateName);
+			script.templateColor = EditorGUILayout.ColorField("Template Color", script.templateColor);
 		}
 	}
 }
