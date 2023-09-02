@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5096112188228614908}
   - component: {fileID: 2057058928}
   - component: {fileID: 1131368753}
+  - component: {fileID: 4954210923964865823}
   m_Layer: 0
   m_Name: DrawArea
   m_TagString: Untagged
@@ -52,14 +53,14 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 12, y: 16}
+    oldSize: {x: 12, y: 14}
     newSize: {x: 1.92, y: 2.56}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 12, y: 16}
+  m_Size: {x: 12, y: 14}
   m_EdgeRadius: 0
 --- !u!212 &5096112188228614908
 SpriteRenderer:
@@ -131,6 +132,28 @@ MonoBehaviour:
   brushWidth: 10
   drawpoints: []
 --- !u!114 &1131368753
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1703329926631543450}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a42205ea6f370504bb9c1b6fd47b7916, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jsonFiles:
+  - {fileID: 4900000, guid: f2d6e417d203aad469713b6e07403ac4, type: 3}
+  - {fileID: 4900000, guid: da23682f9a9296041970ea98a69b2a41, type: 3}
+  - {fileID: 4900000, guid: 2b3ca65c13989a145baceb40370ab7da, type: 3}
+  - {fileID: 4900000, guid: 55c6dcabcdff40444bf1ff070303ed7a, type: 3}
+  - {fileID: 4900000, guid: 24c64c9f5585c884ab6274090d4824fb, type: 3}
+  - {fileID: 4900000, guid: 6c0c0c282228c774f8747d7a4aa5be64, type: 3}
+  - {fileID: 4900000, guid: f90b0245a7434cf46837b4eaffdb1b17, type: 3}
+  - {fileID: 4900000, guid: 7492e0cdead7ce94fb26ff86b4255bcd, type: 3}
+  drawableComponent: {fileID: 2057058928}
+--- !u!114 &4954210923964865823
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
