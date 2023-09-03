@@ -72,7 +72,6 @@ public class GestureManager : MonoBehaviour
 	private void Start()
 	{
 		templatesFilePath = Path.Combine(Application.persistentDataPath, "gesture_templates.json");
-		Debug.Log(templatesFilePath);
 		templates = LoadTemplates();
 	}
 
@@ -89,8 +88,26 @@ public class GestureManager : MonoBehaviour
 			if (bestScore >= detectionThreshold)
 			{
 				hitSound.Play();
-
 				templateColor = bestColor;
+
+				GameObject[] bullets = GameObject.FindGameObjectsWithTag("Bullets");
+				if (bestTemplateName == "Pentagram")
+				{
+					foreach (GameObject bullet in bullets)
+					{
+						Destroy(bullet);
+					}
+				}
+				else
+				{
+					foreach (GameObject bullet in bullets)
+					{
+						if (bullet.name == bestTemplateName)
+						{
+							Destroy(bullet);
+						}
+					}
+				}
 				if (bestTemplateName == "AmongUs")
 				{
 					Color color = Color.red;
