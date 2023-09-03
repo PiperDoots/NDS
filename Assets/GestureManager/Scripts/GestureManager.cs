@@ -21,6 +21,10 @@ public class GestureManager : MonoBehaviour
 
 	[SerializeField]
 	private float detectionThreshold = 0.7f;
+	[SerializeField]
+	private AudioSource hitSound;
+	[SerializeField]
+	private AudioSource missSound;
 
 	[Serializable]
 	public struct GestureTemplate
@@ -84,6 +88,8 @@ public class GestureManager : MonoBehaviour
 			Debug.Log("Best Template: " + bestTemplateName + ", Score: " + bestScore);
 			if (bestScore >= detectionThreshold)
 			{
+				hitSound.Play();
+
 				templateColor = bestColor;
 				if (bestTemplateName == "AmongUs")
 				{
@@ -97,6 +103,7 @@ public class GestureManager : MonoBehaviour
 			}
 			else
 			{
+				missSound.Play();
 				templateColor = Color.clear;
 			}
 		}
