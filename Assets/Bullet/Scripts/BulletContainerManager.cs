@@ -22,6 +22,7 @@ public class BulletContainerManager : MonoBehaviour
 			{
 				// All bullets have left the area, destroy the container
 				Destroy(container);
+				VariableManager.Instance.LoseLife();
 			}
 		}
 	}

@@ -17,7 +17,7 @@ public class GestureManager : MonoBehaviour
 	public Color templateColor = Color.red;
 
 	[SerializeField]
-	private List<GestureTemplate> templates = new List<GestureTemplate>();
+	public List<GestureTemplate> templates = new List<GestureTemplate>();
 
 	[SerializeField]
 	private float detectionThreshold = 0.7f;
@@ -87,29 +87,39 @@ public class GestureManager : MonoBehaviour
 			Debug.Log("Best Template: " + bestTemplateName + ", Score: " + bestScore);
 			if (bestScore >= detectionThreshold)
 			{
-				hitSound.Play();
-				templateColor = bestColor;
-
 				GameObject[] bullets = GameObject.FindGameObjectsWithTag("Bullets");
-				if (bestTemplateName == "Pentagram")
+				if (bestTemplateName == "Pentagram" && VariableManager.Instance.bombs > 0)
 				{
+					hitSound.Play();
+					templateColor = bestColor;
+					VariableManager.Instance.UseBomb();
 					foreach (GameObject bullet in bullets)
 					{
 						Destroy(bullet);
 					}
 				}
+				else if (bestTemplateName == "Pentagram")
+				{
+					missSound.Play();
+					templateColor = Color.clear;
+				}
 				else
 				{
+					hitSound.Play();
+					templateColor = bestColor;
 					foreach (GameObject bullet in bullets)
 					{
 						if (bullet.name == bestTemplateName)
 						{
+							VariableManager.Instance.gameSpeed *= 1 + (0.05f * bestScore);
 							Destroy(bullet);
 						}
 					}
 				}
 				if (bestTemplateName == "AmongUs")
 				{
+					hitSound.Play();
+					templateColor = bestColor;
 					Color color = Color.red;
 					string message = "Sussy Baka";
 
