@@ -78,6 +78,13 @@ public class GestureManager : MonoBehaviour
 	{
 		Vector2[] drawPoints = drawpoints.ToArray();
 		Vector2[] processedPoints = drawpoints.ToArray();
+
+		if (processedPoints == null || processedPoints.Length == 0)
+		{
+			return;
+		}
+
+
 		processedPoints = Dollar1Recogniser.Instance.Normalize(processedPoints, 64);
 
 		if (!saveAsTemplate)
