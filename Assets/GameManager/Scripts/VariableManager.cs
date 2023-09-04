@@ -58,7 +58,7 @@ public class VariableManager : MonoBehaviour
 		songManager.SwitchSong(0);
 		if (lives < 0)
 		{
-			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+			SceneManager.LoadScene("Menu");
 		}
 		else
 		{

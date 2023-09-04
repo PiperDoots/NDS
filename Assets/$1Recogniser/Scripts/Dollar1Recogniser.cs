@@ -43,7 +43,7 @@ public class Dollar1Recogniser : MonoBehaviour
 	}
 
 	// Step 1 
-	private Vector2[] Resample(Vector2[] points, int targetPointCount)
+	public Vector2[] Resample(Vector2[] points, int targetPointCount)
 	{
 		// Calculate the desired interval between points
 		float interval = PathLength(points) / (targetPointCount - 1);

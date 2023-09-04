@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(Collider2D))]
 public class Drawable : MonoBehaviour
 {
+	[SerializeField] private bool menu = false;
 	[SerializeField] private Texture2D paintTexture;
 	[SerializeField] private Texture2D resetTexture;
 	[SerializeField] private Texture2D fadingTexture;
@@ -37,6 +39,10 @@ public class Drawable : MonoBehaviour
 		}
 		else if (Input.GetMouseButtonUp(0)) // Left mouse button released
 		{
+			if (menu)
+			{
+				CreateColliderAroundDrawPoints();
+			}	
 			isPainting = false;
 			isFading = true;
 			ResetTexture();
@@ -154,6 +160,7 @@ public class Drawable : MonoBehaviour
 
 	private void ResetTexture()
 	{
+		if (!menu)
 		GestureManager.Instance.Process(drawpoints);
 		drawpoints.Clear();
 
@@ -186,5 +193,77 @@ public class Drawable : MonoBehaviour
 
 		paintTexture.SetPixels(currentPixels);
 		paintTexture.Apply();
+	}
+
+	private void CreateColliderAroundDrawPoints()
+	{
+		var drawpointArray = Dollar1Recogniser.Instance.Resample(drawpoints.ToArray(), 64);
+		var col = GetComponent<BoxCollider2D>();
+		Vector2 bottomLeftPoint = new Vector2(col.bounds.min.x, col.bounds.min.y);
+
+		// Create a new empty GameObject to hold the collider
+		GameObject colliderObject = new GameObject("DrawCollider");
+		colliderObject.transform.position = new Vector3(bottomLeftPoint.x + 0.5f, bottomLeftPoint.y, 0f);
+		colliderObject.transform.localScale = new Vector3(1 / 16f, 1 / 16f, 0f);
+
+		// Attach a PolygonCollider2D component to the new GameObject
+		PolygonCollider2D collider = colliderObject.AddComponent<PolygonCollider2D>();
+
+		// Convert drawpoints from world space to local space
+		List<Vector2> localDrawPoints = new List<Vector2>();
+		foreach (Vector2 drawPoint in drawpointArray)
+		{
+			Vector2 localPoint = transform.InverseTransformPoint(drawPoint);
+			localDrawPoints.Add(localPoint);
+		}
+
+		// Set the collider points to the local draw points
+		collider.SetPath(0, localDrawPoints.ToArray());
+
+		Debug.Log(collider.errorState.ToString());
+		if (collider.errorState.ToString() == "None")
+		{
+			col.enabled = false;
+
+			// Check for GameObjects inside the collider
+			Collider2D[] colliders = new Collider2D[1];
+			Physics2D.OverlapCollider(collider, new ContactFilter2D(), colliders);
+
+			GameObject menuObject = null;
+			bool multipleSelect = false;
+			if (colliders.Length > 0) 
+			{
+				foreach (var c in colliders)
+				{
+					if (c != null && c.CompareTag("Menu"))
+					{
+						if (menuObject == null)
+						{
+							menuObject = c.gameObject;
+						}
+						else
+						{
+							multipleSelect = true;
+							return;
+						}
+					}
+				}
+			}
+			col.enabled = true;
+			if (menuObject != null && !multipleSelect)
+			{
+				ResetTexture();
+				Destroy(colliderObject);
+				if (menuObject.name == "Start")
+				{
+					SceneManager.LoadScene("BulletScene");
+				}
+				if (menuObject.name == "Quit")
+				{
+					Application.Quit();
+				}
+			}
+		}
+		Destroy(colliderObject);
 	}
 }
