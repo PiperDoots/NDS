@@ -2097,6 +2097,14 @@ PrefabInstance:
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8089881371778979120, guid: 738da230516b3874c892cd966a677d8b, type: 3}
+      propertyPath: gameLevel
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8089881371778979120, guid: 738da230516b3874c892cd966a677d8b, type: 3}
+      propertyPath: gameSpeed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8089881371778979120, guid: 738da230516b3874c892cd966a677d8b, type: 3}
       propertyPath: healSound
       value: 
       objectReference: {fileID: 1827293856}
