@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Bullets
   - Menu
+  - Health
   layers:
   - Default
   - TransparentFX

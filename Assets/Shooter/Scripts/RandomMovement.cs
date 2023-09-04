@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class RandomMovement : MonoBehaviour
 {
-	public List<Transform> targetTransforms;
-	public float initialMoveSpeed = 5f;
-	public float delayBetweenMoves = 2f;
+	[SerializeField] private List<Transform> targetTransforms;
+	[SerializeField] private float initialMoveSpeed = 5f;
+	[SerializeField] private float delayBetweenMoves = 2f;
 
 	private Transform currentTarget;
 	private bool isMoving = false;

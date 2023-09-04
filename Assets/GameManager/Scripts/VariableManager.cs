@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class VariableManager : MonoBehaviour
 {
 	[SerializeField] private AudioSource hitSound;
+	[SerializeField] private AudioSource healSound;
 	public float gameSpeed = 1.0f;
 	public int gameLevel = 0;
 	[SerializeField] private float maxGameSpeed = 10.0f;
@@ -64,6 +65,16 @@ public class VariableManager : MonoBehaviour
 		{
 			UpdateLifeCounter();
 		}
+	}
+
+	public void GainLife()
+	{
+		healSound.Play();
+		if (lives < maxLives)
+		{
+			lives++;
+		}
+		UpdateLifeCounter();
 	}
 
 	public void UseBomb()
