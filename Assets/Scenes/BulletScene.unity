@@ -1312,26 +1312,26 @@ Transform:
   m_Father: {fileID: 1134312649}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1592067756 stripped
+--- !u!1 &1681694077 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 8623978858706961920, guid: 738da230516b3874c892cd966a677d8b, type: 3}
+  m_CorrespondingSourceObject: {fileID: 4372348842801495197, guid: 738da230516b3874c892cd966a677d8b, type: 3}
   m_PrefabInstance: {fileID: 5566312386268079205}
   m_PrefabAsset: {fileID: 0}
---- !u!82 &1592067759
+--- !u!82 &1681694079
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1592067756}
+  m_GameObject: {fileID: 1681694077}
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 71a67cc370f692345a0154668ca800f7, type: 3}
-  m_PlayOnAwake: 0
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -1413,6 +1413,22 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1681694080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1681694077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d391eb255453f3448bd0a02b75c0eced, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  songs:
+  - {fileID: 8300000, guid: 2080fc575585f78458ca1bc27f36821a, type: 3}
+  - {fileID: 8300000, guid: 84f0c89f2a06b4a4a911dbf83535f226, type: 3}
+  - {fileID: 8300000, guid: 7430799bc13d47c40a12263ffb8e2056, type: 3}
 --- !u!1 &1708396462
 GameObject:
   m_ObjectHideFlags: 0
@@ -2145,13 +2161,9 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 8089881371778979120, guid: 738da230516b3874c892cd966a677d8b, type: 3}
-      propertyPath: bombs
-      value: 3
+      propertyPath: maxGameSpeed
+      value: 5
       objectReference: {fileID: 0}
-    - target: {fileID: 8089881371778979120, guid: 738da230516b3874c892cd966a677d8b, type: 3}
-      propertyPath: hitSound
-      value: 
-      objectReference: {fileID: 1592067759}
     - target: {fileID: 8301663542303565687, guid: 738da230516b3874c892cd966a677d8b, type: 3}
       propertyPath: m_RootOrder
       value: 2

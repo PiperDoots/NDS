@@ -107,13 +107,18 @@ public class GestureManager : MonoBehaviour
 				{
 					hitSound.Play();
 					templateColor = bestColor;
+					bool increaseSpeed = false;
 					foreach (GameObject bullet in bullets)
 					{
 						if (bullet.name == bestTemplateName)
 						{
-							VariableManager.Instance.gameSpeed *= 1 + (0.05f * bestScore);
+							increaseSpeed = true;
 							Destroy(bullet);
 						}
+					}
+					if (increaseSpeed)
+					{
+						VariableManager.Instance.ChangeGameSpeed(1 + (.2f * bestScore)/((VariableManager.Instance.gameLevel+1)*3));
 					}
 				}
 				if (bestTemplateName == "AmongUs")

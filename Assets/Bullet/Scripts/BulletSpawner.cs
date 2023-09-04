@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.Rendering;
 
 public class BulletSpawner : MonoBehaviour
 {
@@ -98,7 +99,7 @@ public class BulletSpawner : MonoBehaviour
 
 					float distanceFromCenter = Vector3.Distance(center, spawnPosition);
 					float scale = Mathf.Clamp01(distanceFromCenter / (width * 0.5f));
-					float bulletSpeed = maxBulletSpeed * scale * VariableManager.Instance.gameSpeed;
+					float bulletSpeed = maxBulletSpeed * scale * 1+((VariableManager.Instance.gameLevel + 1)*.1f);
 
 					// Create a new bullet object under the bulletsContainer
 					GameObject bullet = Instantiate(bulletPrefab, bulletsContainer.transform);
