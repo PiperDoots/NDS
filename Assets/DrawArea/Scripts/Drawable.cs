@@ -197,6 +197,10 @@ public class Drawable : MonoBehaviour
 
 	private void CreateColliderAroundDrawPoints()
 	{
+		if (drawpoints.ToArray() == null || drawpoints.ToArray().Length == 0)
+		{
+			return;
+		}
 		var drawpointArray = Dollar1Recogniser.Instance.Resample(drawpoints.ToArray(), 64);
 		var col = GetComponent<BoxCollider2D>();
 		Vector2 bottomLeftPoint = new Vector2(col.bounds.min.x, col.bounds.min.y);
