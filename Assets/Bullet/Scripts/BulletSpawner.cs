@@ -17,7 +17,7 @@ public class BulletSpawner : MonoBehaviour
 		}
 		else
 		{
-			Invoke("SpawnBulletsFromImage", spawnTime * .5f);
+			Invoke("SpawnBulletsFromImage", (spawnTime / VariableManager.Instance.gameSpeed) * 0.5f);
 		}
 	}
 
@@ -27,7 +27,7 @@ public class BulletSpawner : MonoBehaviour
 
 		if (pattern == null || bulletPrefab == null)
 		{
-			Debug.LogError("PixelImage or BulletPrefab is not assigned!");
+			Debug.LogError("PixelImage or bulletPrefab is not assigned!");
 			return;
 		}
 
@@ -42,6 +42,45 @@ public class BulletSpawner : MonoBehaviour
 			tag = "Bullets"
 		};
 		bulletsContainer.transform.position = transform.position;
+
+		List<GestureManager.GestureTemplate> templates = GestureManager.Instance.templates;
+		foreach (GestureManager.GestureTemplate template in templates)
+		{
+			if (template.Name == pattern.name)
+			{
+				var bulletRenderer = bulletPrefab.GetComponentInChildren<SpriteRenderer>();
+				if (bulletRenderer != null)
+				{
+					bulletRenderer.color = template.Color;
+				}
+
+				var bulletParticles = bulletPrefab.GetComponentInChildren<ParticleSystem>();
+				if (bulletParticles != null)
+				{
+					ParticleSystem.MainModule main = bulletParticles.main;
+					ParticleSystem.ColorOverLifetimeModule colorOverLifetime = bulletParticles.colorOverLifetime;
+
+					main.startColor = template.Color;
+
+					// Create a gradient that starts with template.Color and fades to transparent
+					Gradient gradient = new Gradient();
+					GradientColorKey[] colorKeys = new GradientColorKey[2];
+					colorKeys[0].color = template.Color; // Start color
+					colorKeys[0].time = 0.0f;
+					colorKeys[1].color = new Color(template.Color.r, template.Color.g, template.Color.b, 0.0f); // End color (transparent)
+					colorKeys[1].time = 1.0f;
+					GradientAlphaKey[] alphaKeys = new GradientAlphaKey[2];
+					alphaKeys[0].alpha = 1.0f; // Start alpha (fully opaque)
+					alphaKeys[0].time = 0.0f;
+					alphaKeys[1].alpha = 0.0f; // End alpha (fully transparent)
+					alphaKeys[1].time = 1.0f;
+
+					gradient.SetKeys(colorKeys, alphaKeys);
+					colorOverLifetime.color = gradient;
+				}
+			}
+		}
+
 
 		for (int x = 0; x < width; x++)
 		{
@@ -59,7 +98,7 @@ public class BulletSpawner : MonoBehaviour
 
 					float distanceFromCenter = Vector3.Distance(center, spawnPosition);
 					float scale = Mathf.Clamp01(distanceFromCenter / (width * 0.5f));
-					float bulletSpeed = maxBulletSpeed * scale;
+					float bulletSpeed = maxBulletSpeed * scale * VariableManager.Instance.gameSpeed;
 
 					// Create a new bullet object under the bulletsContainer
 					GameObject bullet = Instantiate(bulletPrefab, bulletsContainer.transform);
@@ -72,6 +111,6 @@ public class BulletSpawner : MonoBehaviour
 				}
 			}
 		}
-		Invoke("SpawnBulletsFromImage", spawnTime);
+		Invoke("SpawnBulletsFromImage", spawnTime / VariableManager.Instance.gameSpeed);
 	}
 }
