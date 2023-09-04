@@ -59,7 +59,7 @@ public class VariableManager : MonoBehaviour
 		songManager.SwitchSong(0);
 		if (lives < 0)
 		{
-			SceneManager.LoadScene("Menu");
+			SceneManager.LoadScene("GameOver");
 		}
 		else
 		{
