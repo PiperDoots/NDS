@@ -24,7 +24,21 @@ public class BulletSpawner : MonoBehaviour
 
 	private void SpawnBulletsFromImage()
 	{
-		Texture2D pattern = patternImages[Random.Range(0, patternImages.Count)];
+
+		Texture2D pattern;
+		if (VariableManager.Instance.gameLevel == 0)
+		{
+			pattern = patternImages[Random.Range(0, 2)];
+		}
+		else if (VariableManager.Instance.gameLevel == 1)
+		{
+			pattern = patternImages[Random.Range(0, 3)];
+		}
+		else
+		{
+			pattern = patternImages[Random.Range(0, patternImages.Count)];
+		}
+		
 
 		if (pattern == null || bulletPrefab == null)
 		{

@@ -50,5 +50,10 @@ MonoBehaviour:
   - {fileID: 2800000, guid: c3ce50ae8eefbd94cba59d5de4ce0080, type: 3}
   - {fileID: 2800000, guid: c705fd234a657554a914e36995b8d881, type: 3}
   - {fileID: 2800000, guid: a73e55b8ab4feb84d8867feb738e2022, type: 3}
+  - {fileID: 2800000, guid: 39d8b956fddd35846b85522887fb892d, type: 3}
+  - {fileID: 2800000, guid: f8eac3450d46080479e443acf84dffb7, type: 3}
+  - {fileID: 2800000, guid: 129bc279e79cdaf4e8668d377d7d3fe0, type: 3}
+  - {fileID: 2800000, guid: 0432fcb8d4fbbe149a43133f08ac0436, type: 3}
+  - {fileID: 2800000, guid: b8a36bcebc41146429e46546e49f96e8, type: 3}
   mirror: 0
   spawnTime: 2
