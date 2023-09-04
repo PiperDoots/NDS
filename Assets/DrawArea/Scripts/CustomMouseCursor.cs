@@ -6,7 +6,7 @@ public class CustomMouseCursor : MonoBehaviour
 	[SerializeField] private Texture2D mouseCursorOut;
 	private BoxCollider2D customCursorArea; // Reference to the BoxCollider2D component
 
-	Vector2 hotSpot = new Vector2(7, 24);
+	Vector2 hotSpot = new Vector2(0, 20);
 	CursorMode cursorMode = CursorMode.Auto;
 
 	private void Start()

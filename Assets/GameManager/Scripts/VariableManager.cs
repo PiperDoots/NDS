@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,11 +12,15 @@ public class VariableManager : MonoBehaviour
 	[SerializeField] private int maxLives = 5;
 
 	private int lives = 5;
-	public int bombs = 3;
+	public int bombs = 2;
 
-	public GameObject fullHeartPrefab;
-	public GameObject emptyHeartPrefab;
-	public Transform healthIconsParent; 
+	[SerializeField] GameObject fullHeartPrefab;
+	[SerializeField] GameObject emptyHeartPrefab;
+	[SerializeField] Transform healthIconsParent;
+
+	[SerializeField] Sprite[] bombSprites; 
+	[SerializeField] GameObject bombObject;
+	private SpriteRenderer bombSpriteRenderer;
 
 
 	private SongManager songManager;
@@ -41,6 +46,8 @@ public class VariableManager : MonoBehaviour
 		songManager = GetComponentInChildren<SongManager>();
 		lives = maxLives;
 		UpdateLifeCounter();
+
+		bombSpriteRenderer = bombObject.GetComponent<SpriteRenderer>();
 	}
 
 	public void LoseLife()
@@ -63,6 +70,8 @@ public class VariableManager : MonoBehaviour
 	{
 		bombs--;
 		gameSpeed = 1.0f;
+
+		bombSpriteRenderer.sprite = bombSprites[bombs];
 	}
 
 	public void ChangeGameSpeed(float multiplier)

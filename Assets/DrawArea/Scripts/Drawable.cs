@@ -15,16 +15,25 @@ public class Drawable : MonoBehaviour
 	[SerializeField] private List<Vector2> drawpoints = new List<Vector2>();
 	private bool isPainting = false;
 
+	private AudioSource audioSource;
 	private Vector2 previousHitPoint = Vector2.zero;
 
 	private bool isFading = false;
 	[SerializeField] private float fadeSpeed = 0.02f;
+
+	private void Start()
+	{
+		audioSource = GetComponent<AudioSource>();
+		audioSource.Play();
+		audioSource.Pause();
+	}
 
 	private void Update()
 	{
 		if (Input.GetMouseButtonDown(0)) // Left mouse button pressed
 		{
 			isPainting = true;
+			audioSource.UnPause();
 		}
 		else if (Input.GetMouseButtonUp(0)) // Left mouse button released
 		{
@@ -32,6 +41,7 @@ public class Drawable : MonoBehaviour
 			isFading = true;
 			ResetTexture();
 			previousHitPoint = Vector2.zero; // Reset the previous hit point
+			audioSource.Pause();
 		}
 
 		if (isPainting)
