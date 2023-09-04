@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml;
 using UnityEditor;
-using UnityEditor.VersionControl;
 using UnityEngine;
-
 
 public class GestureManager : MonoBehaviour
 {
@@ -25,6 +22,8 @@ public class GestureManager : MonoBehaviour
 	private AudioSource hitSound;
 	[SerializeField]
 	private AudioSource missSound;
+	[SerializeField]
+	private AudioSource bombSound;
 
 	[Serializable]
 	public struct GestureTemplate
@@ -87,10 +86,13 @@ public class GestureManager : MonoBehaviour
 			Debug.Log("Best Template: " + bestTemplateName + ", Score: " + bestScore);
 			if (bestScore >= detectionThreshold)
 			{
+				float pitch = 0.5f - detectionThreshold + bestScore;
+
 				GameObject[] bullets = GameObject.FindGameObjectsWithTag("Bullets");
 				if (bestTemplateName == "Pentagram" && VariableManager.Instance.bombs > 0)
 				{
-					hitSound.Play();
+					PlayRandomPitch(hitSound);
+					bombSound.Play();
 					templateColor = bestColor;
 					VariableManager.Instance.UseBomb();
 					foreach (GameObject bullet in bullets)
@@ -100,18 +102,18 @@ public class GestureManager : MonoBehaviour
 				}
 				else if (bestTemplateName == "Pentagram")
 				{
-					missSound.Play();
+					PlayPitch(missSound, 0.5f);
 					templateColor = Color.clear;
 				}
 				else
 				{
-					hitSound.Play();
 					templateColor = bestColor;
 					bool increaseSpeed = false;
 					foreach (GameObject bullet in bullets)
 					{
 						if (bullet.name == bestTemplateName)
 						{
+							pitch += 0.5f;
 							increaseSpeed = true;
 							Destroy(bullet);
 						}
@@ -120,22 +122,23 @@ public class GestureManager : MonoBehaviour
 					{
 						VariableManager.Instance.ChangeGameSpeed(1 + (.2f * bestScore)/((VariableManager.Instance.gameLevel+1)*3));
 					}
+					PlayPitch(hitSound, pitch);
 				}
 				if (bestTemplateName == "AmongUs")
 				{
-					hitSound.Play();
+					PlayRandomPitch(hitSound);
 					templateColor = bestColor;
 					Color color = Color.red;
 					string message = "Sussy Baka";
 
 					Debug.Log(string.Format("<size=24><color=#{0:X2}{1:X2}{2:X2}>{3}</color></size>", (byte)(color.r * 255f), (byte)(color.g * 255f), (byte)(color.b * 255f), message));
 					Application.Quit();
-					UnityEditor.EditorApplication.isPlaying = false;
+					//UnityEditor.EditorApplication.isPlaying = false;
 				}
 			}
 			else
 			{
-				missSound.Play();
+				PlayRandomPitch(missSound);
 				templateColor = Color.clear;
 			}
 		}
@@ -251,6 +254,20 @@ public class GestureManager : MonoBehaviour
 		}
 		Debug.Log("Templates saved.");
 	}
+
+	public void PlayRandomPitch(AudioSource audioSource)
+	{
+		float randomPitch = UnityEngine.Random.Range(0.8f, 1.2f);
+		audioSource.pitch = randomPitch;
+		audioSource.Play();
+	}
+
+	public void PlayPitch(AudioSource audioSource, float pitch)
+	{
+		audioSource.pitch = pitch;
+		audioSource.Play();
+	}
+
 }
 #if UNITY_EDITOR
 	[CustomEditor(typeof(GestureManager))]

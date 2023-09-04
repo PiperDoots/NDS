@@ -67,12 +67,12 @@ public class RandomMovement : MonoBehaviour
 			if (!isMovingRight)
 			{
 				// Assuming your object has a SpriteRenderer component
-				GetComponent<SpriteRenderer>().flipX = true;
+				GetComponent<SpriteRenderer>().flipX = false;
 			}
 			else
 			{
 				// Reset sprite flip if moving right
-				GetComponent<SpriteRenderer>().flipX = false;
+				GetComponent<SpriteRenderer>().flipX = true;
 			}
 
 			yield return null;
