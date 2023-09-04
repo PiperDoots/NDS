@@ -1551,11 +1551,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8623978858706961920, guid: 738da230516b3874c892cd966a677d8b, type: 3}
   m_PrefabInstance: {fileID: 5566312386268079205}
   m_PrefabAsset: {fileID: 0}
---- !u!82 &1827293853 stripped
-AudioSource:
-  m_CorrespondingSourceObject: {fileID: 1592067759, guid: 738da230516b3874c892cd966a677d8b, type: 3}
-  m_PrefabInstance: {fileID: 5566312386268079205}
-  m_PrefabAsset: {fileID: 0}
 --- !u!82 &1827293856
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1567,7 +1562,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 35852c969833dce4a9b55e2b41c34f4c, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -2104,7 +2099,7 @@ PrefabInstance:
     - target: {fileID: 8089881371778979120, guid: 738da230516b3874c892cd966a677d8b, type: 3}
       propertyPath: healSound
       value: 
-      objectReference: {fileID: 1827293853}
+      objectReference: {fileID: 1827293856}
     - target: {fileID: 8301663542303565687, guid: 738da230516b3874c892cd966a677d8b, type: 3}
       propertyPath: m_RootOrder
       value: 2
