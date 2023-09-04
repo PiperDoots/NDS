@@ -113,5 +113,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ee5e9d189fb7914b924a156424332f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lifetime: 5
+  lifetime: 7
   spawnPrefab: {fileID: 8764701577590381730, guid: e461bd59200df8049aa419dcd51e5918, type: 3}

@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public class Drawable : MonoBehaviour
 {
 	[SerializeField] private bool menu = false;
+	[SerializeField] private bool gameOver = false;
 	[SerializeField] private Texture2D paintTexture;
 	[SerializeField] private Texture2D resetTexture;
 	[SerializeField] private Texture2D fadingTexture;
@@ -41,6 +42,11 @@ public class Drawable : MonoBehaviour
 		{
 			if (menu)
 			{
+				if(gameOver)
+				{
+					ResetTexture();
+					SceneManager.LoadScene("Menu");
+				}
 				CreateColliderAroundDrawPoints();
 			}	
 			isPainting = false;
