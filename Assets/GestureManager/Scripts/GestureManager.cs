@@ -89,6 +89,7 @@ public class GestureManager : MonoBehaviour
 				float pitch = 0.5f - detectionThreshold + bestScore;
 
 				GameObject[] bullets = GameObject.FindGameObjectsWithTag("Bullets");
+				GameObject[] health = GameObject.FindGameObjectsWithTag("Health");
 				if (bestTemplateName == "Pentagram" && VariableManager.Instance.bombs > 0)
 				{
 					PlayRandomPitch(hitSound);
@@ -104,6 +105,16 @@ public class GestureManager : MonoBehaviour
 				{
 					PlayPitch(missSound, 0.5f);
 					templateColor = Color.clear;
+				}
+				else if (bestTemplateName == "Heart" && health.Length > 0)
+				{
+					PlayRandomPitch(hitSound);
+					templateColor = bestColor;
+					foreach (GameObject h in health)
+					{
+						h.GetComponent<Lifetime>().Kill();
+					}
+					VariableManager.Instance.GainLife();
 				}
 				else
 				{
