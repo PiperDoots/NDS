@@ -8,11 +8,12 @@ public class VariableManager : MonoBehaviour
 	[SerializeField] private AudioSource healSound;
 	public float gameSpeed = 1.0f;
 	public int gameLevel = 0;
-	[SerializeField] private float maxGameSpeed = 10.0f;
+	public float minGameSpeed = 1.0f;
+	[SerializeField] private float maxGameSpeed = 5.0f;
 	[SerializeField] private int maxGameLevel = 3;
-	[SerializeField] private int maxLives = 5;
+	[SerializeField] private int maxLives = 3;
 
-	private int lives = 5;
+	private int lives = 3;
 	public int bombs = 2;
 
 	[SerializeField] GameObject fullHeartPrefab;
@@ -55,7 +56,7 @@ public class VariableManager : MonoBehaviour
 	{
 		hitSound.Play();
 		lives--;
-		gameSpeed = 1.0f;
+		gameSpeed = minGameSpeed;
 		songManager.SwitchSong(0);
 		if (lives < 0)
 		{
@@ -80,7 +81,7 @@ public class VariableManager : MonoBehaviour
 	public void UseBomb()
 	{
 		bombs--;
-		gameSpeed = 1.0f;
+		gameSpeed = minGameSpeed;
 
 		bombSpriteRenderer.sprite = bombSprites[bombs];
 	}
@@ -88,7 +89,11 @@ public class VariableManager : MonoBehaviour
 	public void ChangeGameSpeed(float multiplier)
 	{ 
 		gameSpeed *= multiplier;
-		gameSpeed = Mathf.Clamp(gameSpeed, gameSpeed, maxGameSpeed);
+		gameSpeed = Mathf.Clamp(gameSpeed, minGameSpeed, maxGameSpeed);
+		//cursory implementation of a difficulty floor,
+		//basically slowly increases along with difficulty but doesn't decrease
+		minGameSpeed *= (1 + ((multiplier - 1) / 6));
+		minGameSpeed = Mathf.Clamp(minGameSpeed, minGameSpeed, maxGameSpeed);
 		if (gameSpeed - 1 < maxGameLevel)
 		{
 			gameLevel = (int)gameSpeed - 1;
