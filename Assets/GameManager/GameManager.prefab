@@ -309,11 +309,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hitSound: {fileID: 1592067759}
+  healSound: {fileID: 0}
   gameSpeed: 1
   gameLevel: 0
+  minGameSpeed: 1
   maxGameSpeed: 5
   maxGameLevel: 3
-  maxLives: 5
+  maxLives: 3
   bombs: 3
   fullHeartPrefab: {fileID: 6390899914452616687, guid: e8ad50108d5e9b74bbe84116a3581582, type: 3}
   emptyHeartPrefab: {fileID: 73500059679295698, guid: 0332292116d25a942978a1124a7ab764, type: 3}
