@@ -57,7 +57,8 @@ public class VariableManager : MonoBehaviour
 		hitSound.Play();
 		lives--;
 		gameSpeed = minGameSpeed;
-		songManager.SwitchSong(0);
+		UpdateGameLevel();
+		songManager.SwitchSong(gameLevel);
 		if (lives < 0)
 		{
 			SceneManager.LoadScene("GameOver");
@@ -90,10 +91,15 @@ public class VariableManager : MonoBehaviour
 	{ 
 		gameSpeed *= multiplier;
 		gameSpeed = Mathf.Clamp(gameSpeed, minGameSpeed, maxGameSpeed);
-		//cursory implementation of a difficulty floor,
-		//basically slowly increases along with difficulty but doesn't decrease
 		minGameSpeed *= (1 + ((multiplier - 1) / 6));
 		minGameSpeed = Mathf.Clamp(minGameSpeed, minGameSpeed, maxGameSpeed);
+
+		UpdateGameLevel();
+		songManager.SwitchSong(gameLevel);
+	}
+
+	public void UpdateGameLevel()
+	{
 		if (gameSpeed - 1 < maxGameLevel)
 		{
 			gameLevel = (int)gameSpeed - 1;
@@ -102,8 +108,6 @@ public class VariableManager : MonoBehaviour
 		{
 			gameLevel = maxGameLevel;
 		}
-		
-		songManager.SwitchSong(gameLevel);
 	}
 
 	private void UpdateLifeCounter()
