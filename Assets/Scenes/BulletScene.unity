@@ -2403,5 +2403,6 @@ PrefabInstance:
       propertyPath: mouseCursorOut
       value: 
       objectReference: {fileID: 2800000, guid: 66657ad0503f1e749a1948a4c8a06201, type: 3}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4954210923964865823, guid: ed2bba004cb997348bf5a5c225e0adc6, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: ed2bba004cb997348bf5a5c225e0adc6, type: 3}

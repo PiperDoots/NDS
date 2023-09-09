@@ -42,13 +42,13 @@ public class Drawable : MonoBehaviour
 		{
 			if (menu)
 			{
-				if(gameOver)
+				if (gameOver)
 				{
 					ResetTexture();
 					SceneManager.LoadScene("Menu");
 				}
 				CreateColliderAroundDrawPoints();
-			}	
+			}
 			isPainting = false;
 			isFading = true;
 			ResetTexture();
@@ -164,10 +164,10 @@ public class Drawable : MonoBehaviour
 		paintTexture.Apply();
 	}
 
-	private void ResetTexture()
+	public void ResetTexture()
 	{
 		if (!menu)
-		GestureManager.Instance.Process(drawpoints);
+			GestureManager.Instance.Process(drawpoints);
 		drawpoints.Clear();
 
 		finishedColor = GestureManager.Instance.templateColor;
@@ -241,7 +241,7 @@ public class Drawable : MonoBehaviour
 
 			GameObject menuObject = null;
 			bool multipleSelect = false;
-			if (colliders.Length > 0) 
+			if (colliders.Length > 0)
 			{
 				foreach (var c in colliders)
 				{

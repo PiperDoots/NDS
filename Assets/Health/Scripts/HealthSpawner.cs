@@ -21,7 +21,7 @@ public class HealthSpawner : MonoBehaviour
 			// Reset the timer
 			timer = 0f;
 
-			int randomNumber = Random.Range(0, 1);
+			int randomNumber = Random.Range(0, 5);
 
 			if (randomNumber == 0)
 			{
