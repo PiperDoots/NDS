@@ -138,7 +138,7 @@ public class GestureManager : MonoBehaviour
 					}
 					if (increaseSpeed)
 					{
-						VariableManager.Instance.ChangeGameSpeed(1 + (.2f * bestScore)/((VariableManager.Instance.gameLevel+1)*3));
+						VariableManager.Instance.ChangeGameSpeed(1 + (.2f * bestScore) / ((VariableManager.Instance.gameLevel + 1) * 3));
 					}
 					PlayPitch(hitSound, pitch);
 				}
@@ -191,12 +191,12 @@ public class GestureManager : MonoBehaviour
 	{
 		List<GestureTemplate> loadedTemplates = new List<GestureTemplate>();
 
-		string templatesFolderPath = "Assets/GestureTemplates";
-		string[] templateFiles = Directory.GetFiles(templatesFolderPath, "*.json");
+		// Load all JSON files from the "Resources" folder with a ".json" extension
+		TextAsset[] jsonAssets = Resources.LoadAll<TextAsset>("GestureTemplates");
 
-		foreach (string templateFilePath in templateFiles)
+		foreach (TextAsset jsonAsset in jsonAssets)
 		{
-			string json = File.ReadAllText(templateFilePath);
+			string json = jsonAsset.text;
 			TemplatesData data = JsonUtility.FromJson<TemplatesData>(json);
 
 			bool foundExistingTemplate = false;
@@ -231,6 +231,7 @@ public class GestureManager : MonoBehaviour
 		return loadedTemplates;
 	}
 
+
 	private void SaveTemplates()
 	{
 		foreach (GestureTemplate template in templates)
@@ -245,7 +246,7 @@ public class GestureManager : MonoBehaviour
 				string json = JsonUtility.ToJson(data, true);
 
 				// Create a unique file name for each template
-				string templatesFolderPath = "Assets/GestureTemplates";
+				string templatesFolderPath = "Assets/Resources/GestureTemplates";
 				string templateFileName = $"{data.name}_{i}.json";
 				string templateFilePath = Path.Combine(templatesFolderPath, templateFileName);
 
@@ -288,7 +289,7 @@ public class GestureManager : MonoBehaviour
 
 }
 #if UNITY_EDITOR
-	[CustomEditor(typeof(GestureManager))]
+[CustomEditor(typeof(GestureManager))]
 public class GestureManager_Editor : Editor
 {
 	public override void OnInspectorGUI()
