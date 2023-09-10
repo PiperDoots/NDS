@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.tvOS;
 using WiimoteApi;
 
 [RequireComponent(typeof(SpriteRenderer))]
@@ -139,10 +138,16 @@ public class Drawable : MonoBehaviour
 			{
 				if (menu)
 				{
-					if (gameOver)
+					if (gameOver && timer < 0)
 					{
-						ResetTexture();
-						SceneManager.LoadScene("Menu");
+						float[] pointer = wiimote.Ir.GetPointingPosition();
+						RaycastHit2D hit = Physics2D.Raycast(Camera.main.ViewportToWorldPoint(new Vector2(pointer[0], pointer[1])), Vector2.zero);
+
+						if (hit.collider != null && hit.collider.gameObject == gameObject)
+						{
+							ResetTexture();
+							SceneManager.LoadScene("Menu");
+						}
 					}
 					CreateColliderAroundDrawPoints();
 				}
