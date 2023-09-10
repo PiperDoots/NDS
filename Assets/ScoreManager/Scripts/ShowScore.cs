@@ -14,6 +14,7 @@ public class ShowScore : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI arrowText;
 	[SerializeField] private TextMeshProUGUI totalText;
 	[SerializeField] private TextMeshProUGUI mostClearedText;
+	[SerializeField] private TextMeshProUGUI highScoreText;
 
 	private void Start()
 	{
@@ -48,5 +49,8 @@ public class ShowScore : MonoBehaviour
 
 		if (mostClearedText != null)
 			mostClearedText.text = "Most: " + ScoreManager.Instance.mostCleared;
+
+		if (highScoreText != null)
+			highScoreText.text = ScoreManager.Instance.highScore.ToString();
 	}
 }

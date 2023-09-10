@@ -27,6 +27,7 @@ public class ScoreManager : MonoBehaviour
 	public int line = 0;
 	public int arrow = 0;
 	public int total = 0;
+	public int highScore = 0;
 	private bool paused = true;
 
 	void OnEnable()
@@ -39,6 +40,11 @@ public class ScoreManager : MonoBehaviour
 		SceneManager.sceneLoaded -= OnLevelFinishedLoading;
 	}
 
+	private void Start()
+	{
+		highScore = PlayerPrefs.GetInt("HighScore");
+	}
+
 	private void Update()
 	{
 		if (!paused) 
@@ -48,6 +54,12 @@ public class ScoreManager : MonoBehaviour
 	public void AddScore(int amount)
 	{
 		score += amount;
+
+		if (score > highScore)
+		{
+			highScore = score;
+			PlayerPrefs.SetInt("HighScore", score);
+		}
 	}
 	public void MostCleared(int amount)
 	{

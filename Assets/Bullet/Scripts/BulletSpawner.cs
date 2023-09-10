@@ -28,11 +28,11 @@ public class BulletSpawner : MonoBehaviour
 		Texture2D pattern;
 		if (VariableManager.Instance.gameLevel == 0)
 		{
-			pattern = patternImages[Random.Range(0, 2)];
+			pattern = patternImages[Random.Range(0, 3)];
 		}
 		else if (VariableManager.Instance.gameLevel == 1)
 		{
-			pattern = patternImages[Random.Range(0, 3)];
+			pattern = patternImages[Random.Range(0, 4)];
 		}
 		else
 		{
