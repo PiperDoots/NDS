@@ -1,6 +1,10 @@
+using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.tvOS;
+using WiimoteApi;
 
 [RequireComponent(typeof(SpriteRenderer))]
 [RequireComponent(typeof(Collider2D))]
@@ -16,7 +20,7 @@ public class Drawable : MonoBehaviour
 	[SerializeField] private int brushWidth = 10;
 	[SerializeField] private float timer = 3f;
 
-	[SerializeField] private List<Vector2> drawpoints = new List<Vector2>();
+	[SerializeField] private List<Vector2> drawpoints = new();
 	private bool isPainting = false;
 
 	private AudioSource audioSource;
@@ -25,66 +29,202 @@ public class Drawable : MonoBehaviour
 	private bool isFading = false;
 	[SerializeField] private float fadeSpeed = 0.02f;
 
+	private Wiimote wiimote;
+	private bool prevButtonState = false;
+	private bool usingWiiMote = false;
+	[SerializeField] private Transform pointerObject;
+	[SerializeField] float timeBetweenLEDChanges = 1.0f;
+	private bool[] ledStates = new bool[4];
+
 	private void Start()
 	{
 		audioSource = GetComponent<AudioSource>();
 		audioSource.Play();
 		audioSource.Pause();
+
+		InitializeWiimote();
 	}
+
+	private void InitializeWiimote()
+	{
+		WiimoteManager.FindWiimotes(); // Poll native Bluetooth drivers to find Wiimotes
+
+		foreach (Wiimote remote in WiimoteManager.Wiimotes)
+		{
+			wiimote = remote;
+			remote.SendPlayerLED(true, false, false, false);
+			remote.SetupIRCamera(IRDataType.EXTENDED);
+			Debug.Log("WiiMote Connected");
+		}
+	}
+
+	public void LedPulse()
+	{
+		if (wiimote != null)
+		{
+			StartCoroutine(ChangeLEDs());
+		}
+	}
+
+	private IEnumerator ChangeLEDs()
+	{
+		// Set each LED to true one by one
+		for (int i = 0; i < ledStates.Length; i++)
+		{
+			ledStates[i] = true;
+			wiimote.SendPlayerLED(ledStates[0], ledStates[1], ledStates[2], ledStates[3]);
+			yield return new WaitForSeconds(timeBetweenLEDChanges);
+
+			// Set all LEDs to false
+			for (int j = 0; j < ledStates.Length; j++)
+			{
+				ledStates[j] = false;
+			}
+			wiimote.SendPlayerLED(ledStates[0], ledStates[1], ledStates[2], ledStates[3]);
+			yield return new WaitForSeconds(timeBetweenLEDChanges);
+		}
+		wiimote.SendPlayerLED(true, false, false, false);
+	}
+
 
 	private void Update()
 	{
 		if (gameOver)
 			timer -= Time.deltaTime;
-		if (Input.GetMouseButtonDown(0)) // Left mouse button pressed
+		if (wiimote != null && !usingWiiMote)
 		{
-			isPainting = true;
-			audioSource.UnPause();
-		}
-		else if (Input.GetMouseButtonUp(0)) // Left mouse button released
-		{
-			if (menu)
+			int ret;
+			do
 			{
-				if (gameOver && timer < 0)
-				{
-					RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+				ret = wiimote.ReadWiimoteData();
+				float[] pointer = wiimote.Ir.GetPointingPosition();
 
-					if (hit.collider != null && hit.collider.gameObject == gameObject)
+				if (ret > 0 && pointer[0] >= 0 && pointer[1] >= 0)
+				{
+					usingWiiMote = true;
+					LedPulse();
+					pointerObject.gameObject.GetComponent<SpriteRenderer>().enabled = true;
+				}
+			} while (ret > 0);
+		}
+		if (usingWiiMote && wiimote != null)
+		{
+			int ret;
+			do
+			{
+				ret = wiimote.ReadWiimoteData();
+				float[] pointer = wiimote.Ir.GetPointingPosition();
+
+				if (ret > 0 && pointer[0] >= 0 && pointer[1] >= 0)
+				{
+					// Calculate the position in Unity world space based on camera space position
+					Vector3 worldPosition = Camera.main.ViewportToWorldPoint(new Vector3(pointer[0], pointer[1], 10)); // You may need to adjust the Z value to match your camera setup
+
+					// Move the targetObject (GameObject) to the calculated position
+					pointerObject.position = worldPosition;
+				}
+			} while (ret > 0);
+
+			if (wiimote.Button.a && !prevButtonState) // Left mouse button pressed
+			{
+				isPainting = true;
+				audioSource.UnPause();
+			}
+			else if (!wiimote.Button.a && prevButtonState) // Left mouse button released
+			{
+				if (menu)
+				{
+					if (gameOver)
 					{
 						ResetTexture();
 						SceneManager.LoadScene("Menu");
 					}
+					CreateColliderAroundDrawPoints();
 				}
-				CreateColliderAroundDrawPoints();
+				isPainting = false;
+				isFading = true;
+				ResetTexture();
+				previousHitPoint = Vector2.zero; // Reset the previous hit point
+				audioSource.Pause();
 			}
-			isPainting = false;
-			isFading = true;
-			ResetTexture();
-			previousHitPoint = Vector2.zero; // Reset the previous hit point
-			audioSource.Pause();
-		}
 
-		if (isPainting)
-		{
-			Vector2 hitPoint = GetHitPoint();
-
-			// If the mouse has moved
-			if (hitPoint != Vector2.zero && !drawpoints.Contains(hitPoint))
+			if (isPainting)
 			{
-				if (previousHitPoint != Vector2.zero)
+				Vector2 hitPoint = GetHitPoint();
+
+				// If the mouse has moved
+				if (hitPoint != Vector2.zero && !drawpoints.Contains(hitPoint))
 				{
-					DrawLine(previousHitPoint, hitPoint);
+					if (previousHitPoint != Vector2.zero)
+					{
+						DrawLine(previousHitPoint, hitPoint);
+					}
+
+					PaintTexture(hitPoint);
+					drawpoints.Add(hitPoint);
+
+					previousHitPoint = hitPoint;
 				}
-
-				PaintTexture(hitPoint);
-				drawpoints.Add(hitPoint);
-
-				previousHitPoint = hitPoint;
 			}
+			if (isFading)
+			{
+				FadeOutDrawing();
+			}
+
+			prevButtonState = wiimote.Button.a;
 		}
-		if (isFading)
+		else
 		{
-			FadeOutDrawing();
+			if (Input.GetMouseButtonDown(0)) // Left mouse button pressed
+			{
+				isPainting = true;
+				audioSource.UnPause();
+			}
+			else if (Input.GetMouseButtonUp(0)) // Left mouse button released
+			{
+				if (menu)
+				{
+					if (gameOver && timer < 0)
+					{
+						RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+
+						if (hit.collider != null && hit.collider.gameObject == gameObject)
+						{
+							ResetTexture();
+							SceneManager.LoadScene("Menu");
+						}
+					}
+					CreateColliderAroundDrawPoints();
+				}
+				isPainting = false;
+				isFading = true;
+				ResetTexture();
+				previousHitPoint = Vector2.zero; // Reset the previous hit point
+				audioSource.Pause();
+			}
+
+			if (isPainting)
+			{
+				Vector2 hitPoint = GetHitPoint();
+
+				// If the mouse has moved
+				if (hitPoint != Vector2.zero && !drawpoints.Contains(hitPoint))
+				{
+					if (previousHitPoint != Vector2.zero)
+					{
+						DrawLine(previousHitPoint, hitPoint);
+					}
+
+					PaintTexture(hitPoint);
+					drawpoints.Add(hitPoint);
+
+					previousHitPoint = hitPoint;
+				}
+			}
+			if (isFading)
+			{
+				FadeOutDrawing();
+			}
 		}
 	}
 
@@ -134,8 +274,21 @@ public class Drawable : MonoBehaviour
 
 	private Vector2 GetHitPoint()
 	{
+
 		Vector2 hitPoint = Vector2.zero;
-		RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+		RaycastHit2D hit = new RaycastHit2D();
+		if (usingWiiMote)
+		{
+			if (wiimote != null)
+			{
+				float[] pointer = wiimote.Ir.GetPointingPosition();
+				hit = Physics2D.Raycast(Camera.main.ViewportToWorldPoint(new Vector2(pointer[0], pointer[1])), Vector2.zero);
+			}
+		}
+		else
+		{
+			hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+		}
 
 		if (hit.collider != null && hit.collider.gameObject == gameObject)
 		{
@@ -144,6 +297,7 @@ public class Drawable : MonoBehaviour
 			hitPoint.x *= paintTexture.width;
 			hitPoint.y *= paintTexture.height;
 		}
+
 		return hitPoint;
 	}
 
