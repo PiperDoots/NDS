@@ -14,6 +14,7 @@ public class Drawable : MonoBehaviour
 	[SerializeField] private Color paintColor = Color.red;
 	[SerializeField] private Color finishedColor = Color.red;
 	[SerializeField] private int brushWidth = 10;
+	[SerializeField] private float timer = 3f;
 
 	[SerializeField] private List<Vector2> drawpoints = new List<Vector2>();
 	private bool isPainting = false;
@@ -33,6 +34,8 @@ public class Drawable : MonoBehaviour
 
 	private void Update()
 	{
+		if (gameOver)
+			timer -= Time.deltaTime;
 		if (Input.GetMouseButtonDown(0)) // Left mouse button pressed
 		{
 			isPainting = true;
@@ -42,7 +45,7 @@ public class Drawable : MonoBehaviour
 		{
 			if (menu)
 			{
-				if (gameOver)
+				if (gameOver && timer < 0)
 				{
 					ResetTexture();
 					SceneManager.LoadScene("Menu");

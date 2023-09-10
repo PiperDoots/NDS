@@ -127,6 +127,9 @@ public class GestureManager : MonoBehaviour
 				{
 					templateColor = bestColor;
 					bool increaseSpeed = false;
+					int score = 0;
+					int multiplier = 1;
+					int amountCleared = 0;
 					foreach (GameObject bullet in bullets)
 					{
 						if (bullet.name == bestTemplateName)
@@ -134,6 +137,9 @@ public class GestureManager : MonoBehaviour
 							pitch += 0.5f;
 							increaseSpeed = true;
 							Destroy(bullet);
+							score += 100 * multiplier;
+							multiplier *= 2;
+							amountCleared++;
 						}
 					}
 					if (increaseSpeed)
@@ -141,6 +147,9 @@ public class GestureManager : MonoBehaviour
 						VariableManager.Instance.ChangeGameSpeed(1 + (.2f * bestScore) / ((VariableManager.Instance.gameLevel + 1) * 3));
 					}
 					PlayPitch(hitSound, pitch);
+					ScoreManager.Instance.AddScore(score);
+					ScoreManager.Instance.MostCleared(amountCleared);
+					ScoreManager.Instance.TypeCleared(amountCleared, bestTemplateName);
 				}
 				if (bestTemplateName == "AmongUs")
 				{

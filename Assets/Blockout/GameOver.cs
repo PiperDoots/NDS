@@ -24,7 +24,7 @@ public class GameOver : MonoBehaviour
 		// Check if the object's lifetime has expired
 		if (timer >= lifetime)
 		{
-			SceneManager.LoadScene("Menu");
+			SceneManager.LoadScene("Menu");		
 		}
 	}
 }
