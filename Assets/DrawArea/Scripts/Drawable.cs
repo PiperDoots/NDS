@@ -114,6 +114,7 @@ public class Drawable : MonoBehaviour
 			{
 				ret = wiimote.ReadWiimoteData();
 				float[] pointer = wiimote.Ir.GetPointingPosition();
+				float[] accel = wiimote.Accel.GetCalibratedAccelData();
 
 				if (ret > 0 && pointer[0] >= 0 && pointer[1] >= 0)
 				{
@@ -122,6 +123,10 @@ public class Drawable : MonoBehaviour
 
 					// Move the targetObject (GameObject) to the calculated position
 					pointerObject.position = worldPosition;
+
+					float rotationAngle = Mathf.Atan2(accel[2], accel[0]) * Mathf.Rad2Deg;
+					rotationAngle -= 80;
+					pointerObject.rotation = Quaternion.Euler(0f, 0f, rotationAngle);
 				}
 			} while (ret > 0);
 
