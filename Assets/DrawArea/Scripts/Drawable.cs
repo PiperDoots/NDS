@@ -47,8 +47,13 @@ public class Drawable : MonoBehaviour
 			{
 				if (gameOver && timer < 0)
 				{
-					ResetTexture();
-					SceneManager.LoadScene("Menu");
+					RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+
+					if (hit.collider != null && hit.collider.gameObject == gameObject)
+					{
+						ResetTexture();
+						SceneManager.LoadScene("Menu");
+					}
 				}
 				CreateColliderAroundDrawPoints();
 			}
@@ -173,7 +178,11 @@ public class Drawable : MonoBehaviour
 			GestureManager.Instance.Process(drawpoints);
 		drawpoints.Clear();
 
-		finishedColor = GestureManager.Instance.templateColor;
+		if (GestureManager.Instance.templateColor != null)
+		{
+			finishedColor = GestureManager.Instance.templateColor;
+		}
+		
 
 		Color[] referencePixels = paintTexture.GetPixels();
 		Color[] fadingPixels = fadingTexture.GetPixels();
@@ -274,6 +283,14 @@ public class Drawable : MonoBehaviour
 				if (menuObject.name == "Quit")
 				{
 					Application.Quit();
+				}
+				if (menuObject.name == "Menu")
+				{
+					SceneManager.LoadScene("Menu");
+				}
+				if (menuObject.name == "Tutorial")
+				{
+					SceneManager.LoadScene("Tutorial");
 				}
 			}
 		}

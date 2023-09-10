@@ -187,31 +187,39 @@ public class Dollar1Recogniser : MonoBehaviour
 
 	private (string, float, Color) Recognize(Vector2[] inputPoints, List<GestureManager.GestureTemplate> gestureTemplates)
 	{
-		float bestDistance = Mathf.Infinity;
-		Vector2[] bestMatchedTemplate = new Vector2[0];
-		float bestScore = 0;
-		string bestTemplateName = "None";
-		Color bestTemplateColor = Color.clear;
+		List<(string, float, Color)> topTemplates = new List<(string, float, Color)>();
 
 		foreach (var template in gestureTemplates)
 		{
 			foreach (Vector2[] templatePoints in template.Points)
 			{
 				float distance = DistanceAtBestAngle(inputPoints, templatePoints, -Mathf.PI, Mathf.PI, 2 * Mathf.PI / 180);
+				float score = 1 - distance / (0.5f * Mathf.Sqrt(templatePoints.Length * templatePoints.Length + templatePoints.Length * templatePoints.Length));
 
-				if (distance < bestDistance)
+				// Check if the current template is among the top 5
+				if (topTemplates.Count < 5 || score > topTemplates[4].Item2)
 				{
-					bestDistance = distance;
-					bestMatchedTemplate = templatePoints;
-					bestScore = 1 - bestDistance / (0.5f * Mathf.Sqrt(bestMatchedTemplate.Length * bestMatchedTemplate.Length + bestMatchedTemplate.Length * bestMatchedTemplate.Length));
-					bestTemplateName = template.Name;
-					bestTemplateColor = template.Color;
+					topTemplates.Add((template.Name, score, template.Color));
+					topTemplates.Sort((x, y) => y.Item2.CompareTo(x.Item2)); // Sort by score descending
+					if (topTemplates.Count > 5)
+						topTemplates.RemoveAt(5);
 				}
 			}
 		}
 
-		return (bestTemplateName, bestScore, bestTemplateColor);
+		// Find the most common string among the top 5 templates
+		string mostCommonString = topTemplates.GroupBy(t => t.Item1)
+											   .OrderByDescending(group => group.Count())
+											   .Select(group => group.Key)
+											   .FirstOrDefault();
+
+		// Return the template with the most common string and the highest score
+		var bestTemplate = topTemplates.FirstOrDefault(t => t.Item1 == mostCommonString);
+
+		return bestTemplate;
 	}
+
+
 
 	private float DistanceAtBestAngle(Vector2[] inputPoints, Vector2[] templatePoints, float angleA, float angleB, float angleDelta)
 	{

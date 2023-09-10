@@ -1,4 +1,4 @@
-using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,6 +12,9 @@ public class VariableManager : MonoBehaviour
 	[SerializeField] private float maxGameSpeed = 5.0f;
 	[SerializeField] private int maxGameLevel = 3;
 	[SerializeField] private int maxLives = 3;
+
+	[SerializeField] private float secondsOfInvincibility = 1f;
+	private bool isInvincible = false;
 
 	private int lives = 3;
 	public int bombs = 2;
@@ -54,19 +57,31 @@ public class VariableManager : MonoBehaviour
 
 	public void LoseLife()
 	{
-		hitSound.Play();
-		lives--;
-		gameSpeed = minGameSpeed;
-		UpdateGameLevel();
-		songManager.SwitchSong(gameLevel);
-		if (lives < 0)
+		if (!isInvincible)
 		{
-			SceneManager.LoadScene("GameOver");
+			hitSound.Play();
+			lives--;
+			gameSpeed = minGameSpeed;
+			UpdateGameLevel();
+			songManager.SwitchSong(gameLevel);
+
+			if (lives < 0)
+			{
+				SceneManager.LoadScene("GameOver");
+			}
+			else
+			{
+				StartCoroutine(InvincibilityCoroutine());
+				UpdateLifeCounter();
+			}
 		}
-		else
-		{
-			UpdateLifeCounter();
-		}
+	}
+
+	private IEnumerator InvincibilityCoroutine()
+	{
+		isInvincible = true;
+		yield return new WaitForSeconds(secondsOfInvincibility);
+		isInvincible = false;
 	}
 
 	public void GainLife()
